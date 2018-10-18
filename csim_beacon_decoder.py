@@ -10,7 +10,7 @@ import connect_port_get_packet
 import file_upload
 import datetime
 from serial.tools import list_ports  # This is pyserial, not plain serial
-from minxss_parser import MinxssParser
+from csim_parser import CsimParser
 
 """Call the GUI and attach it to functions."""
 __author__ = "James Paul Mason"
@@ -31,7 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.output_binary_filename = None
 
         self.log = Logger().create_log()
-        self.log.info("Launched MinXSS Beacon Decoder.")
+        self.log.info("Launched CSIM Beacon Decoder.")
 
         self.setup_colors()
         self.setupUi(self)
@@ -94,7 +94,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         callsign = self.lineEdit_callsign.text()
         latitude = self.lineEdit_latitude.text()
         longitude = self.lineEdit_longitude.text()
-        self.base_output_filename = os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "output",
+        self.base_output_filename = os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "output",
                                                  datetime.datetime.now().isoformat().replace(':',
                                                                                              '_')) + '_' + callsign + '_' + latitude + '_' + longitude
 
@@ -109,8 +109,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @staticmethod
     def ensure_output_folder_exists():
-        if not os.path.exists(os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "output")):
-            os.makedirs(os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "output"))
+        if not os.path.exists(os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "output")):
+            os.makedirs(os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "output"))
 
     def set_output_hex_filename(self):
         self.output_hex_filename = self.base_output_filename + ".txt"
@@ -142,13 +142,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         config.set('input_properties', 'callsign', self.lineEdit_callsign.text())
         config.set('input_properties', 'latitude', self.lineEdit_latitude.text())
         config.set('input_properties', 'longitude', self.lineEdit_longitude.text())
-        with open(os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "input_properties.cfg"), 'w') as configfile:
+        with open(os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "input_properties.cfg"), 'w') as configfile:
             config.write(configfile)
         self.log.info('Updated input_properties.cfg file with new settings.')
 
     def setup_last_used_settings(self):
         config = configparser.ConfigParser()
-        self.config_filename = os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "input_properties.cfg")
+        self.config_filename = os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "input_properties.cfg")
         if self.need_new_config_file(config):
             self.log.info('No input_properties.cfg file found. Creating the default one.')
             self.write_default_config()
@@ -345,8 +345,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             self.save_data_to_disk(buffer_data_hex_string, buffer_data)
 
-            minxss_parser = MinxssParser(buffer_data)
-            telemetry = minxss_parser.parse_packet()
+            csim_parser = CsimParser(buffer_data)
+            telemetry = csim_parser.parse_packet()
             self.display_gui_telemetry(telemetry)
 
     def decode_kiss(self, buffer_data):
@@ -394,7 +394,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.display_gui_telemetry_power(telemetry)
         self.display_gui_telemetry_temperature(telemetry)
 
-        self.label_spacecraftMode.setPalette(self.green_color)
+        self.acmode_label.setPalette(self.green_color)
         self.color_code_telemetry(telemetry)
 
     @staticmethod
@@ -407,33 +407,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         utc_time = datetime.datetime.utcnow().replace(microsecond=0).isoformat(' ')
         return utc_time
 
-    def display_gui_telemetry_spacecraft_state(self, telemetry):
-        self.label_flightModel.setText("{0:0=1d}".format(telemetry['FlightModel']))
-        self.label_commandAcceptCount.setText("{0:0=1d}".format(telemetry['CommandAcceptCount']))
-        if telemetry['SpacecraftMode'] == 0:
-            self.label_spacecraftMode.setText("Unknown")
-        elif telemetry['SpacecraftMode'] == 1:
-            self.label_spacecraftMode.setText("Phoenix")
-        elif telemetry['SpacecraftMode'] == 2:
-            self.label_spacecraftMode.setText("Safe")
-        elif telemetry['SpacecraftMode'] == 4:
-            self.label_spacecraftMode.setText("Science")
-        if telemetry['PointingMode'] == 0:
-            self.label_pointingMode.setText("Coarse Point")
-        elif telemetry['PointingMode'] == 1:
-            self.label_pointingMode.setText("Fine Point")
-        if telemetry['EnableX123'] == 1:
-            self.label_enableX123.setText("Yes")
+    # TODO this will have to be edited for CSIM Mode.
+    def display_gui_adcs_mode(self, telemetry):
+        if telemetry['bct_adcs_mode'] == 0:
+            self.acmode_label.setText("Sun Point")
+        elif telemetry['bct_adcs_mode'] == 1:
+            self.acmode_label.setText("Fine Reference Point")
+        elif telemetry['bct_adcs_mode'] == 2:
+            self.acmode_label.setText("Search Init")
+        elif telemetry['bct_adcs_mode'] == 3:
+            self.acmode_label.setText("Searching")
+        elif telemetry['bct_adcs_mode'] == 4:
+            self.acmode_label.setText("Waiting")
+        elif telemetry['bct_adcs_mode'] == 5:
+            self.acmode_label.setText("Converging")
+        elif telemetry['bct_adcs_mode'] == 6:
+            self.acmode_label.setText("On Sun")
+        elif telemetry['bct_adcs_mode'] == 7:
+            self.acmode_label.setText("Not Active")
         else:
-            self.label_enableX123.setText("No")
-        if telemetry['EnableSps'] == 1:
-            self.label_enableSps.setText("Yes")
-        else:
-            self.label_enableSps.setText("No")
-        if telemetry['Eclipse'] == 1:
-            self.label_eclipse.setText("Eclipse")
-        else:
-            self.label_eclipse.setText("In Sun")
+            self.acmode_label.setText("Unknown")
 
     def display_gui_telemetry_solar_data(self, telemetry):
         self.label_spsX.setText("{0:.2f}".format(round(telemetry['SpsX'], 2)))
@@ -479,13 +472,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def color_code_spacecraft_state(self, telemetry):
         if telemetry['SpacecraftMode'] == 0:
-            self.label_spacecraftMode.setPalette(self.red_color)
+            self.acmode_label.setPalette(self.red_color)
         elif telemetry['SpacecraftMode'] == 1:
-            self.label_spacecraftMode.setPalette(self.red_color)
+            self.acmode_label.setPalette(self.red_color)
         elif telemetry['SpacecraftMode'] == 2:
-            self.label_spacecraftMode.setPalette(self.yellow_color)
+            self.acmode_label.setPalette(self.yellow_color)
         elif telemetry['SpacecraftMode'] == 4:
-            self.label_spacecraftMode.setPalette(self.green_color)
+            self.acmode_label.setPalette(self.green_color)
         if telemetry['PointingMode'] == 0:
             self.label_pointingMode.setPalette(self.yellow_color)
         elif telemetry['PointingMode'] == 1:
@@ -612,7 +605,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def prepare_to_exit(self):
         self.log.info("About to quit.")
         self.upload_data()  # Only occurs if forward data is toggled on
-        self.log.info("Closing MinXSS Beacon Decoder.")
+        self.log.info("Closing CSIM Beacon Decoder.")
 
 
 class PortReadThread(QtCore.QThread):

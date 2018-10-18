@@ -1,1 +1,1 @@
-pyinstaller minxss_beacon_decoder.py --onefile -n MinXSS_Beacon_DecoderWin --clean --windowed --noconfirm
+pyinstaller csim_beacon_decoder.py --onefile -n CSIM_Beacon_DecoderWin --clean --windowed --noconfirm

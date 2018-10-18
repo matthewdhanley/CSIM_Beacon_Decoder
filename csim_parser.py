@@ -1,15 +1,15 @@
-"""Parse MinXSS packet"""
-__author__ = "James Paul Mason"
-__contact__ = "jmason86@gmail.com"
+"""Parse CSIM packet"""
+__author__ = "James Paul Mason/Matthew Hanley"
+__contact__ = "mattdhanley@gmail.com"
 
 from numpy import uint8, int16, uint16
 from find_sync_bytes import FindSyncBytes
 from logger import Logger
 
 
-class MinxssParser:
-    def __init__(self, minxss_packet):
-        self.minxss_packet = minxss_packet  # [bytearray]: Un-decoded data to be parsed
+class CsimParser:
+    def __init__(self, csim_packet):
+        self.csim_packet = csim_packet  # [bytearray]: Un-decoded data to be parsed
         self.log = Logger().create_log()
         self.expected_packet_length = 252
 
@@ -25,49 +25,50 @@ class MinxssParser:
         telemetry = dict()
 
         # Note: The [n: n + 2] instead of [n: n + 1] is because python slicing cuts short
-        # e.g., to get bytes at indices 3 and 4, you don't do minxss_packet[3:4], you have to do minxss_packet[3:5]
-        telemetry['FlightModel'] = self.decode_flight_model(self.minxss_packet[51])                        # [Unitless]
-        telemetry['CommandAcceptCount'] = self.decode_command_accept_count(self.minxss_packet[16:16 + 2])  # [#]
-        telemetry['SpacecraftMode'] = self.decode_spacecraft_mode(self.minxss_packet[12])                  # [Unitless]
-        telemetry['PointingMode'] = self.decode_pointing_mode(self.minxss_packet[13])                      # [Unitless]
-        telemetry['Eclipse'] = self.decode_eclipse(self.minxss_packet[12])                                 # [Boolean]
+        # e.g., to get bytes at indices 3 and 4, you don't do minxss_packet[3:4], you have to do csim_packet[3:5]
+        # todo - update all of this
+        telemetry['bct_adcs_mode'] = self.decode_flight_model(self.csim_packet[165])                     # [Unitless]
+        telemetry['CommandAcceptCount'] = self.decode_command_accept_count(self.csim_packet[16:16 + 2])  # [#]
+        telemetry['SpacecraftMode'] = self.decode_spacecraft_mode(self.csim_packet[12])                  # [Unitless]
+        telemetry['PointingMode'] = self.decode_pointing_mode(self.csim_packet[13])                      # [Unitless]
+        telemetry['Eclipse'] = self.decode_eclipse(self.csim_packet[12])                                 # [Boolean]
 
-        telemetry['EnableX123'] = self.decode_enable_x123(self.minxss_packet[88:88 + 2])  # [Boolean]
-        telemetry['EnableSps'] = self.decode_enable_sps(self.minxss_packet[88:88 + 2])    # [Boolean]
+        telemetry['EnableX123'] = self.decode_enable_x123(self.csim_packet[88:88 + 2])  # [Boolean]
+        telemetry['EnableSps'] = self.decode_enable_sps(self.csim_packet[88:88 + 2])    # [Boolean]
 
-        telemetry['SpsX'] = self.decode_sps(self.minxss_packet[204:204 + 2])  # [deg]
-        telemetry['SpsY'] = self.decode_sps(self.minxss_packet[206:206 + 2])  # [deg]
-        telemetry['Xp'] = self.decode_xp(self.minxss_packet[192:192 + 4])     # [DN]
+        telemetry['SpsX'] = self.decode_sps(self.csim_packet[204:204 + 2])  # [deg]
+        telemetry['SpsY'] = self.decode_sps(self.csim_packet[206:206 + 2])  # [deg]
+        telemetry['Xp'] = self.decode_xp(self.csim_packet[192:192 + 4])     # [DN]
 
-        telemetry['CdhBoardTemperature'] = self.decode_temperature(self.minxss_packet[86:86 + 2])                        # [deg C]
-        telemetry['CommBoardTemperature'] = self.decode_temperature(self.minxss_packet[122:122 + 2])                     # [deg C]
-        telemetry['MotherboardTemperature'] = self.decode_temperature(self.minxss_packet[124:124 + 2])                   # [deg C]
-        telemetry['EpsBoardTemperature'] = self.decode_temperature(self.minxss_packet[128:128 + 2])                      # [deg C]
-        telemetry['SolarPanelMinusYTemperature'] = self.decode_temperature_solar_panel(self.minxss_packet[160:160 + 2])  # [deg C]
-        telemetry['SolarPanelPlusXTemperature'] = self.decode_temperature_solar_panel(self.minxss_packet[162:162 + 2])   # [deg C]
-        telemetry['SolarPanelPlusYTemperature'] = self.decode_temperature_solar_panel(self.minxss_packet[164:164 + 2])   # [deg C]
-        telemetry['BatteryTemperature'] = self.decode_temperature_battery(self.minxss_packet[174:174 + 2])               # [deg C]
+        telemetry['CdhBoardTemperature'] = self.decode_temperature(self.csim_packet[86:86 + 2])                        # [deg C]
+        telemetry['CommBoardTemperature'] = self.decode_temperature(self.csim_packet[122:122 + 2])                     # [deg C]
+        telemetry['MotherboardTemperature'] = self.decode_temperature(self.csim_packet[124:124 + 2])                   # [deg C]
+        telemetry['EpsBoardTemperature'] = self.decode_temperature(self.csim_packet[128:128 + 2])                      # [deg C]
+        telemetry['SolarPanelMinusYTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[160:160 + 2])  # [deg C]
+        telemetry['SolarPanelPlusXTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[162:162 + 2])   # [deg C]
+        telemetry['SolarPanelPlusYTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[164:164 + 2])   # [deg C]
+        telemetry['BatteryTemperature'] = self.decode_temperature_battery(self.csim_packet[174:174 + 2])               # [deg C]
 
-        telemetry['BatteryVoltage'] = self.decode_battery_voltage(self.minxss_packet[132:132 + 2])           # [V]
-        telemetry['BatteryChargeCurrent'] = self.decode_battery_current(self.minxss_packet[168:168 + 2])     # [mA]
-        telemetry['BatteryDischargeCurrent'] = self.decode_battery_current(self.minxss_packet[172:172 + 2])  # [mA]
+        telemetry['BatteryVoltage'] = self.decode_battery_voltage(self.csim_packet[132:132 + 2])           # [V]
+        telemetry['BatteryChargeCurrent'] = self.decode_battery_current(self.csim_packet[168:168 + 2])     # [mA]
+        telemetry['BatteryDischargeCurrent'] = self.decode_battery_current(self.csim_packet[172:172 + 2])  # [mA]
         
-        telemetry['SolarPanelMinusYCurrent'] = self.decode_solar_array_current(self.minxss_packet[136:136 + 2])  # [mA]
-        telemetry['SolarPanelPlusXCurrent'] = self.decode_solar_array_current(self.minxss_packet[140:140 + 2])   # [mA]
-        telemetry['SolarPanelPlusYCurrent'] = self.decode_solar_array_current(self.minxss_packet[144:144 + 2])   # [mA]
+        telemetry['SolarPanelMinusYCurrent'] = self.decode_solar_array_current(self.csim_packet[136:136 + 2])  # [mA]
+        telemetry['SolarPanelPlusXCurrent'] = self.decode_solar_array_current(self.csim_packet[140:140 + 2])   # [mA]
+        telemetry['SolarPanelPlusYCurrent'] = self.decode_solar_array_current(self.csim_packet[144:144 + 2])   # [mA]
         
-        telemetry['SolarPanelMinusYVoltage'] = self.decode_solar_array_voltage(self.minxss_packet[138:138 + 2])  # [V]
-        telemetry['SolarPanelPlusXVoltage'] = self.decode_solar_array_voltage(self.minxss_packet[142:142 + 2])   # [V]
-        telemetry['SolarPanelPlusYVoltage'] = self.decode_solar_array_voltage(self.minxss_packet[146:146 + 2])   # [V]
+        telemetry['SolarPanelMinusYVoltage'] = self.decode_solar_array_voltage(self.csim_packet[138:138 + 2])  # [V]
+        telemetry['SolarPanelPlusXVoltage'] = self.decode_solar_array_voltage(self.csim_packet[142:142 + 2])   # [V]
+        telemetry['SolarPanelPlusYVoltage'] = self.decode_solar_array_voltage(self.csim_packet[146:146 + 2])   # [V]
         
-        self.log.info("From MinXSS parser:")
+        self.log.info("From CSIM parser:")
         self.log.info(telemetry)
         return telemetry
 
     def is_valid_packet(self):
         fsb = FindSyncBytes()
-        sync_start_index = fsb.find_sync_start_index(self.minxss_packet)
-        sync_stop_index = fsb.find_sync_stop_index(self.minxss_packet)
+        sync_start_index = fsb.find_sync_start_index(self.csim_packet)
+        sync_stop_index = fsb.find_sync_stop_index(self.csim_packet)
         packet_length = sync_stop_index - sync_start_index
 
         if sync_start_index == -1:
@@ -84,9 +85,10 @@ class MinxssParser:
 
     def ensure_packet_starts_at_sync(self):
         fsb = FindSyncBytes()
-        sync_offset = fsb.find_sync_start_index(self.minxss_packet)
-        self.minxss_packet = self.minxss_packet[sync_offset:len(self.minxss_packet)]
+        sync_offset = fsb.find_sync_start_index(self.csim_packet)
+        self.csim_packet = self.csim_packet[sync_offset:len(self.csim_packet)]
 
+    # TODO - I think the following can be generalized using struct.unpack
     def decode_bytes(self, bytearray_temp, return_unsigned_int=False):
         """
         Combine several bytes corresponding to a single telemetry point to a single integer

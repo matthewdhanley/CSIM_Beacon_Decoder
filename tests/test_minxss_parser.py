@@ -1,14 +1,15 @@
-from minxss_parser import MinxssParser
+from csim_parser import CsimParser
 from example_data import get_example_data
 from find_sync_bytes import FindSyncBytes
 from numpy.testing import assert_approx_equal
 
 buffer_data = get_example_data(1)
-minxss_parser = MinxssParser(buffer_data)
+csim_parser = CsimParser(buffer_data)
 
+# todo - update for csim data
 
 def test_valid_telemetry():
-    telemetry = minxss_parser.parse_packet()
+    telemetry = csim_parser.parse_packet()
 
     assert isinstance(telemetry, dict)
     assert len(telemetry) == 27
@@ -49,37 +50,37 @@ def test_valid_telemetry():
 
 
 def test_invalid_packet():
-    normal_packet = minxss_parser.minxss_packet
+    normal_packet = csim_parser.csim_packet
 
     no_start_sync_packet = normal_packet[1:]
-    minxss_parser.minxss_packet = no_start_sync_packet
-    assert minxss_parser.is_valid_packet() is False
+    csim_parser.csim_packet = no_start_sync_packet
+    assert csim_parser.is_valid_packet() is False
 
     no_stop_sync_packet = normal_packet[0:-2]
-    minxss_parser.minxss_packet = no_stop_sync_packet
-    assert minxss_parser.is_valid_packet() is False
+    csim_parser.csim_packet = no_stop_sync_packet
+    assert csim_parser.is_valid_packet() is False
 
     wrong_length_packet = normal_packet[0:20] + normal_packet[22:]
-    minxss_parser.minxss_packet = wrong_length_packet
-    assert minxss_parser.is_valid_packet() is False
+    csim_parser.csim_packet = wrong_length_packet
+    assert csim_parser.is_valid_packet() is False
 
-    minxss_parser.minxss_packet = normal_packet
+    csim_parser.csim_packet = normal_packet
 
 
 def test_shift_packet_to_sync_start():
     fsb = FindSyncBytes()
 
     # Check that we're starting from the correct position
-    assert minxss_parser.minxss_packet[0:2] == fsb.start_sync_bytes
+    assert csim_parser.csim_packet[0:2] == fsb.start_sync_bytes
 
     # Prepend an extra byte so the sync bytes are no longer at the start
-    minxss_parser.minxss_packet[:0] = bytearray([0x00])
-    assert minxss_parser.minxss_packet[0:2] != fsb.start_sync_bytes
+    csim_parser.csim_packet[:0] = bytearray([0x00])
+    assert csim_parser.csim_packet[0:2] != fsb.start_sync_bytes
 
-    minxss_parser.ensure_packet_starts_at_sync()
-    assert minxss_parser.minxss_packet[0:2] == fsb.start_sync_bytes
+    csim_parser.ensure_packet_starts_at_sync()
+    assert csim_parser.csim_packet[0:2] == fsb.start_sync_bytes
 
 
 def test_decode_bytes():
-    assert minxss_parser.decode_bytes(bytearray([0xFF, 0xDC])) == -8961
-    assert minxss_parser.decode_bytes(bytearray([0xFF, 0xDC]), return_unsigned_int=True) == 56575
+    assert csim_parser.decode_bytes(bytearray([0xFF, 0xDC])) == -8961
+    assert csim_parser.decode_bytes(bytearray([0xFF, 0xDC]), return_unsigned_int=True) == 56575

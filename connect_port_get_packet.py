@@ -36,7 +36,8 @@ class PacketReader:
                     packet = packet[fsb.find_sync_start_index(packet):]
                     found_sync_stop_index = 0
 
-            if len(packet) > 500:  # Assuming that there's no way to have this much header on the 254 byte MinXSS packet
+            # ASSUMPTION HERE THAT PACKET IS LESS THAN 500 BYTES
+            if len(packet) > 500:
                 if found_sync_start_index:
                     packet = packet[fsb.find_sync_start_index(packet):]  # start packet at start sync
                 else:

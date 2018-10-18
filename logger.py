@@ -11,7 +11,7 @@ class Logger:
         For debugging and informational purposes.
         """
         self.ensure_log_folder_exists()
-        log = logging.getLogger('minxss_beacon_decoder_debug')
+        log = logging.getLogger('csim_beacon_decoder_debug')
 
         if not self.logger_exists(log):
             handler = logging.FileHandler(self.create_log_filename())
@@ -31,9 +31,9 @@ class Logger:
 
     @staticmethod
     def ensure_log_folder_exists():
-        if not os.path.exists(os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "log")):
-            os.makedirs(os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "log"))
+        if not os.path.exists(os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "log")):
+            os.makedirs(os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "log"))
 
     @staticmethod
     def create_log_filename():
-        return os.path.join(os.path.expanduser("~"), "MinXSS_Beacon_Decoder", "log", "minxss_beacon_decoder_debug.log")
+        return os.path.join(os.path.expanduser("~"), "CSIM_Beacon_Decoder", "log", "csim_beacon_decoder_debug.log")
