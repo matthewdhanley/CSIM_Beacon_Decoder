@@ -16,32 +16,18 @@ class PacketReader:
         found_sync_start_index = 0
         found_sync_stop_index = 0
         found_log_packet = 0
-        while (found_sync_start_index + found_sync_stop_index) < 2:
+
+        while found_sync_start_index == 0 or len(packet) < 272:
             buffered_data = self.get_data_from_buffer()
             for byte in buffered_data:
                 packet.append(byte)
-
             fsb = FindSyncBytes()
-            if fsb.find_log_sync_start_index(packet) != -1:
-                found_log_packet = True
             if fsb.find_sync_start_index(packet) != -1:
-                found_sync_start_index = True
-            if fsb.find_sync_stop_index(packet) != -1:
-                if found_log_packet:
-                    packet = bytearray()  # Clear out the packet because its a log message not a housekeeping packet
-                else:
-                    found_sync_stop_index = True
-            if found_sync_start_index and found_sync_stop_index:
-                if fsb.find_sync_start_index(packet) > fsb.find_sync_stop_index(packet):
-                    packet = packet[fsb.find_sync_start_index(packet):]
-                    found_sync_stop_index = 0
+                found_sync_start_index+=1
 
-            # ASSUMPTION HERE THAT PACKET IS LESS THAN 500 BYTES
-            if len(packet) > 500:
-                if found_sync_start_index:
-                    packet = packet[fsb.find_sync_start_index(packet):]  # start packet at start sync
-                else:
-                    packet = bytearray()
+            if found_sync_start_index:
+                start_ind = fsb.find_sync_start_index(packet)
+                packet = packet[start_ind:]
 
         return packet
 

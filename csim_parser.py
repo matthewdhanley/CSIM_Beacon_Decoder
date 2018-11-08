@@ -17,7 +17,9 @@ class CsimParser:
         """
         Returns decoded telemetry as a dictionary
         """
+        print('parsing')
         if not self.is_valid_packet():
+            print('not valid')
             return None
 
         self.ensure_packet_starts_at_sync()
@@ -52,7 +54,7 @@ class CsimParser:
         telemetry['bct_battery_current'] =self.decode_general(self.csim_packet[261:263],2,2e-3,'sn')
         #telemetry['bct_gps_valid'] =self.decode_general(self.csim_packet[275:276],1,2e-3,'sn')
 
-        telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300],1,1e0,'sn')
+        # telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300],1,1e0,'sn')
         telemetry['bct_mag_vector_body1'] =self.decode_general(self.csim_packet[232:234],2,5e-9,'sn')
         telemetry['bct_mag_vector_body2'] =self.decode_general(self.csim_packet[234:236],2,5e-9,'sn')
         telemetry['bct_mag_vector_body3'] =self.decode_general(self.csim_packet[236:238],2,5e-9,'sn')
@@ -97,18 +99,13 @@ class CsimParser:
     def is_valid_packet(self):
         fsb = FindSyncBytes()
         sync_start_index = fsb.find_sync_start_index(self.csim_packet)
-        sync_stop_index = fsb.find_sync_stop_index(self.csim_packet)
-        packet_length = sync_stop_index - sync_start_index
 
         if sync_start_index == -1:
             self.log.error('Invalid packet detected. No sync start pattern found. Returning.')
             return False
-        if sync_stop_index == -1:
-            self.log.error('Invalid packet detected. No sync stop pattern found. Returning.')
-            return False
-        if packet_length != self.expected_packet_length:
-            self.log.error('Invalid packet detected. Packet length is {0} but expected to be {1}. Returning.'.format(packet_length, self.expected_packet_length))
-            return False
+        # if packet_length != self.expected_packet_length:
+        #     self.log.error('Invalid packet detected. Packet length is {0} but expected to be {1}. Returning.'.format(packet_length, self.expected_packet_length))
+        #     return False
 
         return True
 
