@@ -40875,7 +40875,7 @@ p, li { white-space: pre-wrap; }
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="assets/QtAssets.qrc">
+           <iconset>
             <normaloff>:/assets/MinXSS CubeSat Logo White.png</normaloff>
             <normalon>:/assets/MinXSS CubeSat Logo White.png</normalon>:/assets/MinXSS CubeSat Logo White.png</iconset>
           </property>
@@ -41325,7 +41325,7 @@ p, li { white-space: pre-wrap; }
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="assets/QtAssets.qrc">
+           <iconset>
             <normaloff>:/assets/CU LASP White Text.png</normaloff>
             <normalon>:/assets/CU LASP White Text.png</normalon>:/assets/CU LASP White Text.png</iconset>
           </property>
@@ -44539,7 +44539,7 @@ p, li { white-space: pre-wrap; }
   </widget>
   <action name="actionConnect">
    <property name="icon">
-    <iconset resource="assets/QtAssets.qrc">
+    <iconset>
      <normaloff>:/assets/universal-serial-usb-connector.png</normaloff>
      <normalon>:/assets/universal-serial-usb-connector.png</normalon>:/assets/universal-serial-usb-connector.png</iconset>
    </property>
@@ -44555,7 +44555,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionCompletePass">
    <property name="icon">
-    <iconset resource="assets/QtAssets.qrc">
+    <iconset>
      <normaloff>:/assets/satellite-station.png</normaloff>
      <normalon>:/assets/satellite-station.png</normalon>:/assets/satellite-station.png</iconset>
    </property>
@@ -44568,7 +44568,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionRefreshSerialPorts">
    <property name="icon">
-    <iconset resource="assets/QtAssets.qrc">
+    <iconset>
      <normaloff>:/assets/refresh-button.png</normaloff>
      <normalon>:/assets/refresh-button.png</normalon>:/assets/refresh-button.png</iconset>
    </property>
@@ -44598,7 +44598,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
-  <include location="assets/QtAssets.qrc"/>
+  <include location="C:/Users/mhanl/Downloads/assets/QtAssets.qrc"/>
  </resources>
  <connections/>
 </ui>
