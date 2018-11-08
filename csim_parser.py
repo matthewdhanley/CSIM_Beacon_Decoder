@@ -27,40 +27,69 @@ class CsimParser:
         # Note: The [n: n + 2] instead of [n: n + 1] is because python slicing cuts short
         # e.g., to get bytes at indices 3 and 4, you don't do minxss_packet[3:4], you have to do csim_packet[3:5]
         # todo - update all of this
-        telemetry['bct_adcs_mode'] = self.decode_flight_model(self.csim_packet[165])                     # [Unitless]
-        telemetry['CommandAcceptCount'] = self.decode_command_accept_count(self.csim_packet[16:16 + 2])  # [#]
-        telemetry['SpacecraftMode'] = self.decode_spacecraft_mode(self.csim_packet[12])                  # [Unitless]
-        telemetry['PointingMode'] = self.decode_pointing_mode(self.csim_packet[13])                      # [Unitless]
-        telemetry['Eclipse'] = self.decode_eclipse(self.csim_packet[12])                                 # [Boolean]
+        # The telem points that are commented out still need unique functions. The rest of them use 
+        #the new general decode function. It hasn't been tested so mileage may vary. 
+        # telemetry['bct_adcs_mode'] = self.decode_spacecraft_mode(self.csim_packet[165])                    # [Unitless]
+        # telemetry['tai_label'] = self.stuff
+        # telemetry['time_valid_label'] = 
+        telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119],4,5e-10,'sn')
+        telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123],4,5e-10,'sn')
+        telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127],4,5e-10,'sn')
+        telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131],4,5e-10,'sn')
+        print(telemetry['bct_Q_BODY_WRT_ECI4'])
+        #telemetry['attitude_valid_label'] = stuff
+        telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[168:170],2,4e-1,'sn')
+        telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[170:172],2,4e-1,'sn')
+        telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[172:174],2,4e-1,'sn')
+        print(telemetry['bct_filtered_speed_rpm3'])
+        telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187],4,2e-9,'sn')
+        telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191],4,2e-9,'sn')
+        telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195],4,2e-9,'sn')
 
-        telemetry['EnableX123'] = self.decode_enable_x123(self.csim_packet[88:88 + 2])  # [Boolean]
-        telemetry['EnableSps'] = self.decode_enable_sps(self.csim_packet[88:88 + 2])    # [Boolean]
+        telemetry['bct_box1_temp'] =self.decode_general(self.csim_packet[255:257],2,5e-3,'sn')
+        telemetry['bct_bus_voltage'] =self.decode_general(self.csim_packet[257:259],2,1e-3,'sn')
+        telemetry['bct_battery_voltage'] =self.decode_general(self.csim_packet[259:261],2,2e-3,'sn')
+        telemetry['bct_battery_current'] =self.decode_general(self.csim_packet[261:263],2,2e-3,'sn')
+        #telemetry['bct_gps_valid'] =self.decode_general(self.csim_packet[275:276],1,2e-3,'sn')
 
-        telemetry['SpsX'] = self.decode_sps(self.csim_packet[204:204 + 2])  # [deg]
-        telemetry['SpsY'] = self.decode_sps(self.csim_packet[206:206 + 2])  # [deg]
-        telemetry['Xp'] = self.decode_xp(self.csim_packet[192:192 + 4])     # [DN]
+        telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300],1,1e0,'sn')
+        telemetry['bct_mag_vector_body1'] =self.decode_general(self.csim_packet[232:234],2,5e-9,'sn')
+        telemetry['bct_mag_vector_body2'] =self.decode_general(self.csim_packet[234:236],2,5e-9,'sn')
+        telemetry['bct_mag_vector_body3'] =self.decode_general(self.csim_packet[236:238],2,5e-9,'sn')
 
-        telemetry['CdhBoardTemperature'] = self.decode_temperature(self.csim_packet[86:86 + 2])                        # [deg C]
-        telemetry['CommBoardTemperature'] = self.decode_temperature(self.csim_packet[122:122 + 2])                     # [deg C]
-        telemetry['MotherboardTemperature'] = self.decode_temperature(self.csim_packet[124:124 + 2])                   # [deg C]
-        telemetry['EpsBoardTemperature'] = self.decode_temperature(self.csim_packet[128:128 + 2])                      # [deg C]
-        telemetry['SolarPanelMinusYTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[160:160 + 2])  # [deg C]
-        telemetry['SolarPanelPlusXTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[162:162 + 2])   # [deg C]
-        telemetry['SolarPanelPlusYTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[164:164 + 2])   # [deg C]
-        telemetry['BatteryTemperature'] = self.decode_temperature_battery(self.csim_packet[174:174 + 2])               # [deg C]
+        #Old tlm points
+        # telemetry['CommandAcceptCount'] = self.decode_command_accept_count(self.csim_packet[16:16 + 2])  # [#]
+        # telemetry['SpacecraftMode'] = self.decode_spacecraft_mode(self.csim_packet[12])                  # [Unitless]
+        # telemetry['PointingMode'] = self.decode_pointing_mode(self.csim_packet[13])                      # [Unitless]
+        # telemetry['Eclipse'] = self.decode_eclipse(self.csim_packet[12])                                 # [Boolean]
 
-        telemetry['BatteryVoltage'] = self.decode_battery_voltage(self.csim_packet[132:132 + 2])           # [V]
-        telemetry['BatteryChargeCurrent'] = self.decode_battery_current(self.csim_packet[168:168 + 2])     # [mA]
-        telemetry['BatteryDischargeCurrent'] = self.decode_battery_current(self.csim_packet[172:172 + 2])  # [mA]
+        # telemetry['EnableX123'] = self.decode_enable_x123(self.csim_packet[88:88 + 2])  # [Boolean]
+        # telemetry['EnableSps'] = self.decode_enable_sps(self.csim_packet[88:88 + 2])    # [Boolean]
+
+        # telemetry['SpsX'] = self.decode_sps(self.csim_packet[204:204 + 2])  # [deg]
+        # telemetry['SpsY'] = self.decode_sps(self.csim_packet[206:206 + 2])  # [deg]
+        # telemetry['Xp'] = self.decode_xp(self.csim_packet[192:192 + 4])     # [DN]
+
+        # telemetry['CdhBoardTemperature'] = self.decode_temperature(self.csim_packet[86:86 + 2])                        # [deg C]
+        # telemetry['CommBoardTemperature'] = self.decode_temperature(self.csim_packet[122:122 + 2])                     # [deg C]
+        # telemetry['MotherboardTemperature'] = self.decode_temperature(self.csim_packet[124:124 + 2])                   # [deg C]
+        # telemetry['EpsBoardTemperature'] = self.decode_temperature(self.csim_packet[128:128 + 2])                      # [deg C]
+        # telemetry['SolarPanelMinusYTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[160:160 + 2])  # [deg C]
+        # telemetry['SolarPanelPlusXTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[162:162 + 2])   # [deg C]
+        # telemetry['SolarPanelPlusYTemperature'] = self.decode_temperature_solar_panel(self.csim_packet[164:164 + 2])   # [deg C]
+        # telemetry['BatteryTemperature'] = self.decode_temperature_battery(self.csim_packet[174:174 + 2])               # [deg C]
+
+        # telemetry['BatteryVoltage'] = self.decode_battery_voltage(self.csim_packet[132:132 + 2])           # [V]
+        # telemetry['BatteryChargeCurrent'] = self.decode_battery_current(self.csim_packet[168:168 + 2])     # [mA]
+        # telemetry['BatteryDischargeCurrent'] = self.decode_battery_current(self.csim_packet[172:172 + 2])  # [mA]
         
-        telemetry['SolarPanelMinusYCurrent'] = self.decode_solar_array_current(self.csim_packet[136:136 + 2])  # [mA]
-        telemetry['SolarPanelPlusXCurrent'] = self.decode_solar_array_current(self.csim_packet[140:140 + 2])   # [mA]
-        telemetry['SolarPanelPlusYCurrent'] = self.decode_solar_array_current(self.csim_packet[144:144 + 2])   # [mA]
+        # telemetry['SolarPanelMinusYCurrent'] = self.decode_solar_array_current(self.csim_packet[136:136 + 2])  # [mA]
+        # telemetry['SolarPanelPlusXCurrent'] = self.decode_solar_array_current(self.csim_packet[140:140 + 2])   # [mA]
+        # telemetry['SolarPanelPlusYCurrent'] = self.decode_solar_array_current(self.csim_packet[144:144 + 2])   # [mA]
         
-        telemetry['SolarPanelMinusYVoltage'] = self.decode_solar_array_voltage(self.csim_packet[138:138 + 2])  # [V]
-        telemetry['SolarPanelPlusXVoltage'] = self.decode_solar_array_voltage(self.csim_packet[142:142 + 2])   # [V]
-        telemetry['SolarPanelPlusYVoltage'] = self.decode_solar_array_voltage(self.csim_packet[146:146 + 2])   # [V]
-        
+        # telemetry['SolarPanelMinusYVoltage'] = self.decode_solar_array_voltage(self.csim_packet[138:138 + 2])  # [V]
+        # telemetry['SolarPanelPlusXVoltage'] = self.decode_solar_array_voltage(self.csim_packet[142:142 + 2])   # [V]
+        # telemetry['SolarPanelPlusYVoltage'] = self.decode_solar_array_voltage(self.csim_packet[146:146 + 2])   # [V]
         self.log.info("From CSIM parser:")
         self.log.info(telemetry)
         return telemetry
@@ -119,15 +148,24 @@ class CsimParser:
 
     @staticmethod
     def decode_flight_model(bytearray_temp):
-        flight_model = (bytearray_temp & 0x0030) >> 4  # [Unitless]
+        flight_model = (bytearray_temp & 0x07)  # [Unitless]
 
         # Fix mistaken flight model number in final flight software burn
-        if flight_model == 3:
+        if flight_model == 0:
             flight_model = 2
         elif flight_model == 4:
             flight_model = 3  # This is the engineering test unit (AKA FlatSat)
         return flight_model
     
+    def decode_general(self, bytearray_temp, nbytes, conversion,type):
+        if type == 'sn':
+            return_unsigned_int=False
+        else:
+            return_unsigned_int=True
+
+        fullvalue = self.decode_bytes(bytearray_temp,return_unsigned_int)
+        return fullvalue * conversion
+
     def decode_command_accept_count(self, bytearray_temp):
         return self.decode_bytes(bytearray_temp)  # [#]
     
@@ -177,3 +215,5 @@ class CsimParser:
     
     def decode_solar_array_voltage(self, bytearray_temp):
         return self.decode_bytes(bytearray_temp, return_unsigned_int=True) * 32.76 / 32768.0  # [V]
+
+
