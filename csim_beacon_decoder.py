@@ -391,8 +391,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Last packet at: {} local    /    {} UTC".format(self.get_local_time(), self.get_utc_time()))
 
         self.display_gui_adcs_mode(telemetry)
-        # self.display_gui_telemetry_solar_data(telemetry)
-        # self.display_gui_telemetry_power(telemetry)
+        self.display_gui_telemetry_attitude(telemetry)
+        self.display_gui_telemetry_power(telemetry)
         # self.display_gui_telemetry_temperature(telemetry)
 
         # self.acmode_label.setPalette(self.green_color)
@@ -435,35 +435,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_xp.setText("{0:.2f}".format(round(telemetry['Xp'], 2)))
 
     def display_gui_telemetry_power(self, telemetry):
-        self.label_batteryVoltage.setText("{0:.2f}".format(round(telemetry['BatteryVoltage'], 2)))
-        battery_current = self.get_battery_current(telemetry)
-        self.label_batteryCurrent.setText("{0:.2f}".format(round(battery_current, 2)))
-
-        solar_panel_minus_y_power = telemetry['SolarPanelMinusYVoltage'] * telemetry['SolarPanelMinusYCurrent'] / 1e3
-        solar_panel_plus_x_power = telemetry['SolarPanelPlusXVoltage'] * telemetry['SolarPanelPlusXCurrent'] / 1e3
-        solar_panel_plus_y_power = telemetry['SolarPanelPlusYVoltage'] * telemetry['SolarPanelPlusYCurrent'] / 1e3
-        self.label_solarPanelMinusYPower.setText("{0:.2f}".format(round(solar_panel_minus_y_power, 2)))
-        self.label_solarPanelPlusXPower.setText("{0:.2f}".format(round(solar_panel_plus_x_power, 2)))
-        self.label_solarPanelPlusYPower.setText("{0:.2f}".format(round(solar_panel_plus_y_power, 2)))
-
-    def get_battery_current(self, telemetry):
-        if telemetry['BatteryChargeCurrent'] > telemetry['BatteryDischargeCurrent']:
-            battery_current = telemetry['BatteryChargeCurrent'] / 1e3
-            self.label_batteryCurrentText.setText("Battery Charge Current")
-        else:
-            battery_current = telemetry['BatteryDischargeCurrent'] / 1e3
-            self.label_batteryCurrentText.setText("Battery Discharge Current")
-        return battery_current
+        self.bati_label.setText("{0:.2f}".format(round(telemetry['bct_battery_current'], 2)))
 
     def display_gui_telemetry_temperature(self, telemetry):
-        self.label_commBoardTemperature.setText("{0:.2f}".format(round(telemetry['CommBoardTemperature'], 2)))
-        self.label_batteryTemperature.setText("{0:.2f}".format(round(telemetry['BatteryTemperature'], 2)))
-        self.label_epsBoardTemperature.setText("{0:.2f}".format(round(telemetry['EpsBoardTemperature'], 2)))
-        self.label_cdhTemperature.setText("{0:.2f}".format(round(telemetry['CdhBoardTemperature'], 2)))
-        self.label_motherboardTemperature.setText("{0:.2f}".format(round(telemetry['MotherboardTemperature'], 2)))
-        self.label_solarPanelMinusYTemperature.setText("{0:.2f}".format(round(telemetry['SolarPanelMinusYTemperature'], 2)))
-        self.label_solarPanelPlusXTemperature.setText("{0:.2f}".format(round(telemetry['SolarPanelPlusXTemperature'], 2)))
-        self.label_solarPanelPlusYTemperature.setText("{0:.2f}".format(round(telemetry['SolarPanelPlusYTemperature'], 2)))
+        self.radio_temp_label.setText("{0:.2f}".format(round(telemetry['bct_sdr_temp'], 2)))
+        self.case_temp_label.setText("{0:.2f}".format(round(telemetry['bct_box1_temp'], 2)))
+
+    def display_gui_telemetry_attitude(self,telemetry):
+        self.quat1_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI1'], 2)))
+        self.quat2_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI2'], 2)))
+        self.quat3_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI3'], 2)))
+        self.quat4_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI4'], 2)))
+        #self.attitude_valid_label.setText("{0:.2f}".format(round(telemetry['bct_attitude_valid'], 2)))
+        #self.acmode_label.setText("{0:.2f}".format(round(telemetry['bct_adcs_mode'], 2)))
+        self.rw1sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm1'], 2)))
+        self.rw2sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm2'], 2)))
+        self.rw3sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm3'], 2)))
+        self.atterr1_label.setText("{0:.2f}".format(round(telemetry['bct_position_error1'], 2)))
+        self.atterr2_label.setText("{0:.2f}".format(round(telemetry['bct_position_error2'], 2)))
+        self.atterr3_label.setText("{0:.2f}".format(round(telemetry['bct_position_error3'], 2)))
+
+
+    def display_gui_telemetry_general(self,telemetry):
+        self.tai_label.setText("{0:.2f}".format(round(telemetry['bct_tai_seconds'], 2)))
+        self.time_valid_label.setText("{0:.2f}".format(round(telemetry['bct_time_valid'], 2)))
+        self.gps_valid_label.setText("{0:.2f}".format(round(telemetry['bct_gps_valid'], 2)))
+
 
     def color_code_telemetry(self, telemetry):
         self.color_code_spacecraft_state(telemetry)

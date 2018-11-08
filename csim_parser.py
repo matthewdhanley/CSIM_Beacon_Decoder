@@ -17,9 +17,7 @@ class CsimParser:
         """
         Returns decoded telemetry as a dictionary
         """
-        print('parsing')
         if not self.is_valid_packet():
-            print('not valid')
             return None
 
         self.ensure_packet_starts_at_sync()
@@ -31,19 +29,17 @@ class CsimParser:
         # todo - update all of this
         # The telem points that are commented out still need unique functions. The rest of them use 
         #the new general decode function. It hasn't been tested so mileage may vary. 
-        # telemetry['bct_adcs_mode'] = self.decode_spacecraft_mode(self.csim_packet[165])                    # [Unitless]
+        telemetry['bct_adcs_mode'] = self.decode_spacecraft_mode(self.csim_packet[165])                    # [Unitless]
         # telemetry['tai_label'] = self.stuff
         # telemetry['time_valid_label'] = 
         telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119],4,5e-10,'sn')
         telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123],4,5e-10,'sn')
         telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127],4,5e-10,'sn')
         telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131],4,5e-10,'sn')
-        print(telemetry['bct_Q_BODY_WRT_ECI4'])
         #telemetry['attitude_valid_label'] = stuff
         telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[168:170],2,4e-1,'sn')
         telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[170:172],2,4e-1,'sn')
         telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[172:174],2,4e-1,'sn')
-        print(telemetry['bct_filtered_speed_rpm3'])
         telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187],4,2e-9,'sn')
         telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191],4,2e-9,'sn')
         telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195],4,2e-9,'sn')
