@@ -4,6 +4,7 @@ import configparser
 from PySide2 import QtGui, QtCore
 from PySide2.QtWidgets import QMainWindow, QApplication
 from PySide2.QtGui import QColor
+from PySide2.QtCore import QFile
 from ui_mainWindow import Ui_MainWindow
 from logger import Logger
 import connect_port_get_packet
@@ -389,13 +390,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_lastPacketTime.setText(
             "Last packet at: {} local    /    {} UTC".format(self.get_local_time(), self.get_utc_time()))
 
-        self.display_gui_telemetry_spacecraft_state(telemetry)
-        self.display_gui_telemetry_solar_data(telemetry)
-        self.display_gui_telemetry_power(telemetry)
-        self.display_gui_telemetry_temperature(telemetry)
+        self.display_gui_adcs_mode(telemetry)
+        # self.display_gui_telemetry_solar_data(telemetry)
+        # self.display_gui_telemetry_power(telemetry)
+        # self.display_gui_telemetry_temperature(telemetry)
 
-        self.acmode_label.setPalette(self.green_color)
-        self.color_code_telemetry(telemetry)
+        # self.acmode_label.setPalette(self.green_color)
+        # self.color_code_telemetry(telemetry)
 
     @staticmethod
     def get_local_time():
