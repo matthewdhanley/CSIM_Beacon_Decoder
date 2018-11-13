@@ -32,28 +32,29 @@ class CsimParser:
         telemetry['bct_adcs_mode'] = self.decode_spacecraft_mode(self.csim_packet[165])                    # [Unitless]
         # telemetry['tai_label'] = self.stuff
         # telemetry['time_valid_label'] = 
-        telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119],4,5e-10,'sn')
-        telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123],4,5e-10,'sn')
-        telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127],4,5e-10,'sn')
-        telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131],4,5e-10,'sn')
+        telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119], 4, 5e-10, 'sn')
+        telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123], 4, 5e-10, 'sn')
+        telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127], 4, 5e-10, 'sn')
+        telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131], 4, 5e-10, 'sn')
         #telemetry['attitude_valid_label'] = stuff
-        telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[168:170],2,4e-1,'sn')
-        telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[170:172],2,4e-1,'sn')
-        telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[172:174],2,4e-1,'sn')
-        telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187],4,2e-9,'sn')
-        telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191],4,2e-9,'sn')
-        telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195],4,2e-9,'sn')
+        telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[168:170], 2, 4e-1, 'sn')
+        telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[170:172], 2, 4e-1, 'sn')
+        telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[172:174], 2, 4e-1, 'sn')
+        telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187], 4, 2e-9, 'sn')
+        telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191], 4, 2e-9, 'sn')
+        telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195], 4, 2e-9, 'sn')
 
-        telemetry['bct_box1_temp'] =self.decode_general(self.csim_packet[255:257],2,5e-3,'sn')
-        telemetry['bct_bus_voltage'] =self.decode_general(self.csim_packet[257:259],2,1e-3,'sn')
-        telemetry['bct_battery_voltage'] =self.decode_general(self.csim_packet[259:261],2,2e-3,'sn')
-        telemetry['bct_battery_current'] =self.decode_general(self.csim_packet[261:263],2,2e-3,'sn')
-        #telemetry['bct_gps_valid'] =self.decode_general(self.csim_packet[275:276],1,2e-3,'sn')
+        telemetry['bct_box1_temp'] =self.decode_general(self.csim_packet[255:257], 2, 5e-3, 'sn')
 
-        # telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300],1,1e0,'sn')
-        telemetry['bct_mag_vector_body1'] =self.decode_general(self.csim_packet[232:234],2,5e-9,'sn')
-        telemetry['bct_mag_vector_body2'] =self.decode_general(self.csim_packet[234:236],2,5e-9,'sn')
-        telemetry['bct_mag_vector_body3'] =self.decode_general(self.csim_packet[236:238],2,5e-9,'sn')
+        telemetry['bct_bus_voltage'] =self.decode_general(self.csim_packet[257:259], 2, 1e-3,'sn')
+        telemetry['bct_battery_voltage'] =self.decode_general(self.csim_packet[259:261], 2, 2e-3, 'sn')
+        telemetry['bct_battery_current'] =self.decode_general(self.csim_packet[261:263], 2, 2e-3, 'sn')
+        telemetry['bct_gps_valid'] =self.decode_general(self.csim_packet[275:276], 1, 1, 'dn')
+
+        telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300], 1, 1e0, 'sn')
+        telemetry['bct_mag_vector_body1'] =self.decode_general(self.csim_packet[232:234], 2, 5e-9, 'sn')
+        telemetry['bct_mag_vector_body2'] =self.decode_general(self.csim_packet[234:236], 2, 5e-9, 'sn')
+        telemetry['bct_mag_vector_body3'] =self.decode_general(self.csim_packet[236:238], 2, 5e-9, 'sn')
 
         #Old tlm points
         # telemetry['CommandAcceptCount'] = self.decode_command_accept_count(self.csim_packet[16:16 + 2])  # [#]

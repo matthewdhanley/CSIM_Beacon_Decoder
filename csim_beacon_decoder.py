@@ -390,10 +390,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_lastPacketTime.setText(
             "Last packet at: {} local    /    {} UTC".format(self.get_local_time(), self.get_utc_time()))
 
-        self.display_gui_adcs_mode(telemetry)
         self.display_gui_telemetry_attitude(telemetry)
         self.display_gui_telemetry_power(telemetry)
-        # self.display_gui_telemetry_temperature(telemetry)
+        self.display_gui_telemetry_temperature(telemetry)
 
         # self.acmode_label.setPalette(self.green_color)
         # self.color_code_telemetry(telemetry)
@@ -429,25 +428,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.acmode_label.setText("Unknown")
 
-    def display_gui_telemetry_solar_data(self, telemetry):
-        self.label_spsX.setText("{0:.2f}".format(round(telemetry['SpsX'], 2)))
-        self.label_spsY.setText("{0:.2f}".format(round(telemetry['SpsY'], 2)))
-        self.label_xp.setText("{0:.2f}".format(round(telemetry['Xp'], 2)))
-
     def display_gui_telemetry_power(self, telemetry):
         self.bati_label.setText("{0:.2f}".format(round(telemetry['bct_battery_current'], 2)))
+        self.batv_label.setText("{0:.2f}".format(round(telemetry['bct_battery_voltage'], 2)))
+        self.busv_label.setText("{0:.2f}".format(round(telemetry['bct_bus_voltage'], 2)))
 
     def display_gui_telemetry_temperature(self, telemetry):
         self.radio_temp_label.setText("{0:.2f}".format(round(telemetry['bct_sdr_temp'], 2)))
         self.case_temp_label.setText("{0:.2f}".format(round(telemetry['bct_box1_temp'], 2)))
+        self.batt1_temp_label.setText("{0:.2f}".format(round(telemetry['bct_battery1_temp'], 2)))
+        self.batt2_temp_label.setText("{0:.2f}".format(round(telemetry['bct_battery2_temp'], 2)))
 
     def display_gui_telemetry_attitude(self,telemetry):
+        self.display_gui_adcs_mode(telemetry)
         self.quat1_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI1'], 2)))
         self.quat2_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI2'], 2)))
         self.quat3_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI3'], 2)))
         self.quat4_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI4'], 2)))
-        #self.attitude_valid_label.setText("{0:.2f}".format(round(telemetry['bct_attitude_valid'], 2)))
-        #self.acmode_label.setText("{0:.2f}".format(round(telemetry['bct_adcs_mode'], 2)))
+        self.attitude_valid_label.setText("{0:.2f}".format(round(telemetry['bct_attitude_valid'], 2)))
         self.rw1sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm1'], 2)))
         self.rw2sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm2'], 2)))
         self.rw3sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm3'], 2)))
@@ -455,12 +453,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.atterr2_label.setText("{0:.2f}".format(round(telemetry['bct_position_error2'], 2)))
         self.atterr3_label.setText("{0:.2f}".format(round(telemetry['bct_position_error3'], 2)))
 
-
     def display_gui_telemetry_general(self,telemetry):
         self.tai_label.setText("{0:.2f}".format(round(telemetry['bct_tai_seconds'], 2)))
         self.time_valid_label.setText("{0:.2f}".format(round(telemetry['bct_time_valid'], 2)))
         self.gps_valid_label.setText("{0:.2f}".format(round(telemetry['bct_gps_valid'], 2)))
-
 
     def color_code_telemetry(self, telemetry):
         self.color_code_spacecraft_state(telemetry)

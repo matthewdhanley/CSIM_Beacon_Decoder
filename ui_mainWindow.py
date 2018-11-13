@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_MainWindow.ui'
+# Form implementation generated from reading ui file 'ui_mainWindow.ui'
 #
-# Created: Thu Nov  8 14:19:33 2018
+# Created: Tue Nov 13 07:59:36 2018
 #      by: pyside2-uic 2.0.0 running on PySide2 5.6.0~a1
 #
 # WARNING! All changes made in this file will be lost!
