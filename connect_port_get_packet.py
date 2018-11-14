@@ -17,7 +17,7 @@ class PacketReader:
         found_sync_stop_index = 0
         found_log_packet = 0
 
-        while found_sync_start_index == 0 or len(packet) < 272:
+        while found_sync_start_index == 0 or len(packet) < 400:
             buffered_data = self.get_data_from_buffer()
             for byte in buffered_data:
                 packet.append(byte)

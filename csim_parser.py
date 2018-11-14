@@ -5,13 +5,14 @@ __contact__ = "mattdhanley@gmail.com"
 from numpy import uint8, int16, uint16
 from find_sync_bytes import FindSyncBytes
 from logger import Logger
+import struct
 
 
 class CsimParser:
     def __init__(self, csim_packet):
         self.csim_packet = csim_packet  # [bytearray]: Un-decoded data to be parsed
         self.log = Logger().create_log()
-        self.expected_packet_length = 252
+        self.expected_packet_length = 400
 
     def parse_packet(self):
         """
@@ -21,6 +22,15 @@ class CsimParser:
             return None
 
         self.ensure_packet_starts_at_sync()
+        self.csim_packet = self.csim_packet[:]
+
+        for i,x in enumerate(self.csim_packet):
+            print(str(i)+':0x{:02x}'.format(x))
+
+        hex_str = ' '.join('0x{:02x}'.format(x) for x in self.csim_packet)
+
+        print(hex_str)
+        print('')
 
         telemetry = dict()
 
@@ -32,29 +42,36 @@ class CsimParser:
         telemetry['bct_adcs_mode'] = self.decode_spacecraft_mode(self.csim_packet[165])                    # [Unitless]
         # telemetry['tai_label'] = self.stuff
         # telemetry['time_valid_label'] = 
-        telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119], 4, 5e-10, 'sn')
-        telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123], 4, 5e-10, 'sn')
-        telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127], 4, 5e-10, 'sn')
-        telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131], 4, 5e-10, 'sn')
+        telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119], 4, 'sn', conversion=5e-10)
+        telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123], 4, 'sn', conversion=5e-10)
+        telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127], 4, 'sn', conversion=5e-10)
+        telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131], 4, 'sn', conversion=5e-10)
         #telemetry['attitude_valid_label'] = stuff
-        telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[168:170], 2, 4e-1, 'sn')
-        telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[170:172], 2, 4e-1, 'sn')
-        telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[172:174], 2, 4e-1, 'sn')
-        telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187], 4, 2e-9, 'sn')
-        telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191], 4, 2e-9, 'sn')
-        telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195], 4, 2e-9, 'sn')
+        telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[168:170], 2, 'sn', conversion=4e-1)
+        telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[170:172], 2, 'sn', conversion=4e-1)
+        telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[172:174], 2, 'sn', conversion=4e-1)
+        telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187], 4, 'sn', conversion=2e-9)
+        telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191], 4, 'sn', conversion=2e-9)
+        telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195], 4, 'sn', conversion=2e-9)
 
-        telemetry['bct_box1_temp'] =self.decode_general(self.csim_packet[255:257], 2, 5e-3, 'sn')
+        telemetry['bct_box1_temp'] =self.decode_general(self.csim_packet[305:307], 2, 'sn', conversion=5e-3)
 
-        telemetry['bct_bus_voltage'] =self.decode_general(self.csim_packet[257:259], 2, 1e-3,'sn')
-        telemetry['bct_battery_voltage'] =self.decode_general(self.csim_packet[259:261], 2, 2e-3, 'sn')
-        telemetry['bct_battery_current'] =self.decode_general(self.csim_packet[261:263], 2, 2e-3, 'sn')
-        telemetry['bct_gps_valid'] =self.decode_general(self.csim_packet[275:276], 1, 1, 'dn')
+        telemetry['bct_bus_voltage'] =self.decode_general(self.csim_packet[315:317], 2,'sn', conversion=1e-3)
 
-        telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300], 1, 1e0, 'sn')
-        telemetry['bct_mag_vector_body1'] =self.decode_general(self.csim_packet[232:234], 2, 5e-9, 'sn')
-        telemetry['bct_mag_vector_body2'] =self.decode_general(self.csim_packet[234:236], 2, 5e-9, 'sn')
-        telemetry['bct_mag_vector_body3'] =self.decode_general(self.csim_packet[236:238], 2, 5e-9, 'sn')
+        hex_str_busv = ' '.join('0x{:02x}'.format(x) for x in self.csim_packet[257:259])
+        print(hex_str_busv)
+        print('')
+
+
+
+        telemetry['bct_battery_voltage'] =self.decode_general(self.csim_packet[317:319], 2, 'sn', conversion=2e-3)
+        telemetry['bct_battery_current'] =self.decode_general(self.csim_packet[319:321], 2, 'sn', conversion=2e-3)
+        # telemetry['bct_gps_valid'] =self.decode_general(self.csim_packet[275:276], 1, 1, 'dn')
+
+        # telemetry['bct_sdr_temp'] =self.decode_general(self.csim_packet[299:300], 1, 1e0, 'sn')
+        telemetry['bct_mag_vector_body1'] =self.decode_general(self.csim_packet[232:234], 2, 'sn', conversion=5e-9)
+        telemetry['bct_mag_vector_body2'] =self.decode_general(self.csim_packet[234:236], 2, 'sn', conversion=5e-9)
+        telemetry['bct_mag_vector_body3'] =self.decode_general(self.csim_packet[236:238], 2, 'sn',conversion=5e-9)
 
         #Old tlm points
         # telemetry['CommandAcceptCount'] = self.decode_command_accept_count(self.csim_packet[16:16 + 2])  # [#]
@@ -127,7 +144,7 @@ class CsimParser:
         if len(bytearray_temp) == 1:
             telemetry_point_raw = bytearray_temp
         elif len(bytearray_temp) == 2:
-            telemetry_point_raw = (uint8(bytearray_temp[1]) << 8) | uint8(bytearray_temp[0])
+            telemetry_point_raw = struct.unpack('>H',bytearray_temp)[0]
         elif len(bytearray_temp) == 4:
             telemetry_point_raw = (uint8(bytearray_temp[3]) << 24) | (uint8(bytearray_temp[2] << 16)) | \
                                   (uint8(bytearray_temp[1] << 8)) | (uint8(bytearray_temp[0] << 0))
@@ -151,14 +168,39 @@ class CsimParser:
             flight_model = 3  # This is the engineering test unit (AKA FlatSat)
         return flight_model
     
-    def decode_general(self, bytearray_temp, nbytes, conversion,type):
-        if type == 'sn':
-            return_unsigned_int=False
+    def decode_general(self, bytearray_temp, nbytes, dtype, conversion=1, endian='big'):
+        unpack_format = ''
+        if nbytes == 1:
+            unpack_format = 'b'
+        elif nbytes == 2:
+            unpack_format = 'h'
+        elif nbytes == 4:
+            unpack_format = 'i'
+        elif nbytes == 8:
+            unpack_format = 'q'
         else:
-            return_unsigned_int=True
+            self.log.debug("Not an expected number of bytes.")
+            return None
 
-        fullvalue = self.decode_bytes(bytearray_temp,return_unsigned_int)
-        return fullvalue * conversion
+        if dtype == 'sn':
+            unpack_format = unpack_format.upper()
+        elif dtype == 'dn':
+            unpack_format = unpack_format.lower()
+        else:
+            self.log.debug("Not an expected data format")
+            return None
+
+        if endian == 'big':
+            unpack_format = '>' + unpack_format
+        elif endian == 'little':
+            unpack_format = '<' + unpack_format
+        else:
+            self.log.debug("Using system unpack format")
+
+        raw_value = struct.unpack(unpack_format,bytearray_temp)[0]
+        converted_value = raw_value * conversion
+
+        return converted_value
 
     def decode_command_accept_count(self, bytearray_temp):
         return self.decode_bytes(bytearray_temp)  # [#]
