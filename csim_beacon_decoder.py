@@ -351,6 +351,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.display_gui_telemetry(telemetry)
 
     def decode_kiss(self, buffer_data):
+        # todo - fix for ax25
         if self.do_decode_kiss():
             # C0 is a special KISS character that get replaced; unreplace it
             buffer_data = buffer_data.replace(bytearray([0xdb, 0xdc]), bytearray([0xc0]))
@@ -394,9 +395,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.display_gui_telemetry_power(telemetry)
         self.display_gui_telemetry_temperature(telemetry)
 
-        # self.acmode_label.setPalette(self.green_color)
-        # self.color_code_telemetry(telemetry)
-
     @staticmethod
     def get_local_time():
         local_time = datetime.datetime.now().replace(microsecond=0).isoformat(' ')
@@ -411,20 +409,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def display_gui_adcs_mode(self, telemetry):
         if telemetry['bct_adcs_mode'] == 0:
             self.acmode_label.setText("Sun Point")
+            self.acmode_label.setPalette(self.green_color)
         elif telemetry['bct_adcs_mode'] == 1:
             self.acmode_label.setText("Fine Reference Point")
+            self.acmode_label.setPalette(self.green_color)
         elif telemetry['bct_adcs_mode'] == 2:
             self.acmode_label.setText("Search Init")
+            self.acmode_label.setPalette(self.yellow_color)
         elif telemetry['bct_adcs_mode'] == 3:
             self.acmode_label.setText("Searching")
+            self.acmode_label.setPalette(self.yellow_color)
         elif telemetry['bct_adcs_mode'] == 4:
             self.acmode_label.setText("Waiting")
+            self.acmode_label.setPalette(self.yellow_color)
         elif telemetry['bct_adcs_mode'] == 5:
             self.acmode_label.setText("Converging")
+            self.acmode_label.setPalette(self.green_color)
         elif telemetry['bct_adcs_mode'] == 6:
             self.acmode_label.setText("On Sun")
+            self.acmode_label.setPalette(self.green_color)
         elif telemetry['bct_adcs_mode'] == 7:
             self.acmode_label.setText("Not Active")
+            self.acmode_label.setPalette(self.red_color)
         else:
             self.acmode_label.setText("Unknown")
 
@@ -453,7 +459,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.atterr2_label.setText("{0:.2f}".format(round(telemetry['bct_position_error2'], 2)))
         self.atterr3_label.setText("{0:.2f}".format(round(telemetry['bct_position_error3'], 2)))
 
-    def display_gui_telemetry_general(self,telemetry):
+    def display_gui_telemetry_general(self, telemetry):
         self.tai_label.setText("{0:.2f}".format(round(telemetry['bct_tai_seconds'], 2)))
         self.time_valid_label.setText("{0:.2f}".format(round(telemetry['bct_time_valid'], 2)))
         self.gps_valid_label.setText("{0:.2f}".format(round(telemetry['bct_gps_valid'], 2)))
@@ -463,108 +469,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.color_code_solar_data(telemetry)
         self.color_code_power(telemetry)
         self.color_code_temperature(telemetry)
-
-    def color_code_spacecraft_state(self, telemetry):
-        if telemetry['SpacecraftMode'] == 0:
-            self.acmode_label.setPalette(self.red_color)
-        elif telemetry['SpacecraftMode'] == 1:
-            self.acmode_label.setPalette(self.red_color)
-        elif telemetry['SpacecraftMode'] == 2:
-            self.acmode_label.setPalette(self.yellow_color)
-        elif telemetry['SpacecraftMode'] == 4:
-            self.acmode_label.setPalette(self.green_color)
-        if telemetry['PointingMode'] == 0:
-            self.label_pointingMode.setPalette(self.yellow_color)
-        elif telemetry['PointingMode'] == 1:
-            self.label_pointingMode.setPalette(self.green_color)
-
-    def color_code_solar_data(self, telemetry):
-        if abs(telemetry['SpsX']) <= 3.0:
-            self.label_spsX.setPalette(self.green_color)
-        else:
-            self.label_spsX.setPalette(self.red_color)
-
-        if abs(telemetry['SpsY']) <= 3.0:
-            self.label_spsY.setPalette(self.green_color)
-        else:
-            self.label_spsY.setPalette(self.red_color)
-
-        if 0 <= telemetry['Xp'] <= 24860.0:
-            self.label_xp.setPalette(self.green_color)
-        else:
-            self.label_xp.setPalette(self.red_color)
-
-    def color_code_power(self, telemetry):
-        solar_panel_minus_y_power = telemetry['SolarPanelMinusYVoltage'] * telemetry['SolarPanelMinusYCurrent'] / 1e3
-        solar_panel_plus_x_power = telemetry['SolarPanelPlusXVoltage'] * telemetry['SolarPanelPlusXCurrent'] / 1e3
-        solar_panel_plus_y_power = telemetry['SolarPanelPlusYVoltage'] * telemetry['SolarPanelPlusYCurrent'] / 1e3
-        battery_current = self.get_battery_current(telemetry)
-
-        if -1.0 <= solar_panel_minus_y_power <= 10.4:
-            self.label_solarPanelMinusYPower.setPalette(self.green_color)
-        else:
-            self.label_solarPanelMinusYPower.setPalette(self.red_color)
-        if -1.0 <= solar_panel_plus_x_power <= 5.9:
-            self.label_solarPanelPlusXPower.setPalette(self.green_color)
-        else:
-            self.label_solarPanelPlusXPower.setPalette(self.red_color)
-        if -1.0 <= solar_panel_plus_y_power <= 10.4:
-            self.label_solarPanelPlusYPower.setPalette(self.green_color)
-        else:
-            self.label_solarPanelPlusYPower.setPalette(self.red_color)
-        if telemetry['BatteryVoltage'] >= 7.2:
-            self.label_batteryVoltage.setPalette(self.green_color)
-        elif telemetry['BatteryVoltage'] >= 6.6:
-            self.label_batteryVoltage.setPalette(self.yellow_color)
-        else:
-            self.label_batteryVoltage.setPalette(self.red_color)
-        if 0 <= battery_current <= 2.9:
-            self.label_batteryCurrent.setPalette(self.green_color)
-        else:
-            self.label_batteryCurrent.setPalette(self.red_color)
-
-    def color_code_temperature(self, telemetry):
-        if -8.0 <= telemetry['CommBoardTemperature'] <= 60.0:
-            self.label_commBoardTemperature.setPalette(self.green_color)
-        else:
-            self.label_commBoardTemperature.setPalette(self.red_color)
-
-        if 5.0 <= telemetry['BatteryTemperature'] <= 25:
-            self.label_batteryTemperature.setPalette(self.green_color)
-        elif 2.0 <= telemetry['BatteryTemperature'] < 5.0 or telemetry['BatteryTemperature'] > 25.0:
-            self.label_batteryTemperature.setPalette(self.yellow_color)
-        else:
-            self.label_batteryTemperature.setPalette(self.red_color)
-
-        if -8.0 <= telemetry['EpsBoardTemperature'] <= 45.0:
-            self.label_epsBoardTemperature.setPalette(self.green_color)
-        else:
-            self.label_epsBoardTemperature.setPalette(self.red_color)
-
-        if -8.0 <= telemetry['CdhBoardTemperature'] <= 29.0:
-            self.label_cdhTemperature.setPalette(self.green_color)
-        else:
-            self.label_cdhTemperature.setPalette(self.red_color)
-
-        if -13.0 <= telemetry['MotherboardTemperature'] <= 28.0:
-            self.label_motherboardTemperature.setPalette(self.green_color)
-        else:
-            self.label_motherboardTemperature.setPalette(self.red_color)
-
-        if -75.0 <= telemetry['SolarPanelMinusYTemperature'] <= 85.0:
-            self.label_solarPanelMinusYTemperature.setPalette(self.green_color)
-        else:
-            self.label_solarPanelMinusYTemperature.setPalette(self.red_color)
-
-        if -75.0 <= telemetry['SolarPanelPlusXTemperature'] <= 85.0:
-            self.label_solarPanelPlusXTemperature.setPalette(self.green_color)
-        else:
-            self.label_solarPanelPlusXTemperature.setPalette(self.red_color)
-
-        if -75.0 <= telemetry['SolarPanelPlusYTemperature'] <= 85.0:
-            self.label_solarPanelPlusYTemperature.setPalette(self.green_color)
-        else:
-            self.label_solarPanelPlusYTemperature.setPalette(self.red_color)
 
     def stop_read(self):
         self.connected_port.close()
@@ -620,7 +524,7 @@ class PortReadThread(QtCore.QThread):
 
 def main():
     app = QApplication(sys.argv)
-    mainWin = MainWindow()
+    MainWindow()
     ret = app.exec_()
     sys.exit(ret)
 
