@@ -191,11 +191,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         with open(self.config_filename, "w") as config_file:
             print("[input_properties]", file=config_file)
             print("serial_port = 3", file=config_file)
-            print("baud_rate = 19200", file=config_file)
+            print("baud_rate = 9600", file=config_file)
             print("ip_address = localhost", file=config_file)
             print("port = 10000", file=config_file)
-            print("decode_kiss = True", file=config_file)
-            print("forward_data = True", file=config_file)
+            print("decode_kiss = False", file=config_file)
+            print("forward_data = False", file=config_file)
             print("callsign = SFJPM86", file=config_file)
             print("latitude = 40.240", file=config_file)
             print("longitude = -105.2353", file=config_file)
@@ -394,6 +394,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.display_gui_telemetry_attitude(telemetry)
         self.display_gui_telemetry_power(telemetry)
         self.display_gui_telemetry_temperature(telemetry)
+        self.display_gui_telemetry_general(telemetry)
+
 
     @staticmethod
     def get_local_time():
@@ -451,24 +453,45 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.quat2_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI2'], 2)))
         self.quat3_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI3'], 2)))
         self.quat4_label.setText("{0:.2f}".format(round(telemetry['bct_Q_BODY_WRT_ECI4'], 2)))
-        # self.attitude_valid_label.setText("{0:.2f}".format(round(telemetry['bct_attitude_valid'], 2)))
+        self.decode_attitude_valid(telemetry)
         self.rw1sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm1'], 2)))
         self.rw2sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm2'], 2)))
         self.rw3sdir_label.setText("{0:.2f}".format(round(telemetry['bct_filtered_speed_rpm3'], 2)))
         self.atterr1_label.setText("{0:.2f}".format(round(telemetry['bct_position_error1'], 2)))
         self.atterr2_label.setText("{0:.2f}".format(round(telemetry['bct_position_error2'], 2)))
         self.atterr3_label.setText("{0:.2f}".format(round(telemetry['bct_position_error3'], 2)))
+        self.mag1_label.setText("{0:.2f}".format(round(telemetry['bct_mag_vector_body1'], 2)))
+        self.mag2_label.setText("{0:.2f}".format(round(telemetry['bct_mag_vector_body2'], 2)))
+        self.mag3_label.setText("{0:.2f}".format(round(telemetry['bct_mag_vector_body3'], 2)))
 
     def display_gui_telemetry_general(self, telemetry):
         self.tai_label.setText("{0:.2f}".format(round(telemetry['bct_tai_seconds'], 2)))
-        self.time_valid_label.setText("{0:.2f}".format(round(telemetry['bct_time_valid'], 2)))
-        self.gps_valid_label.setText("{0:.2f}".format(round(telemetry['bct_gps_valid'], 2)))
+        self.decode_time_valid(telemetry)
+        # self.time_valid_label.setText("{0:.2f}".format(round(telemetry['bct_time_valid'], 2)))
+        # self.gps_valid_label.setText("{0:.2f}".format(round(telemetry['bct_gps_valid'], 2)))
 
     def color_code_telemetry(self, telemetry):
         self.color_code_spacecraft_state(telemetry)
         self.color_code_solar_data(telemetry)
         self.color_code_power(telemetry)
         self.color_code_temperature(telemetry)
+
+    def decode_time_valid(self, telemetry):
+        if telemetry['bct_time_valid'] == 0:
+            self.time_valid_label.setText("No")
+            self.time_valid_label.setPalette(self.red_color)
+        else:
+            self.time_valid_label.setText("Yes")
+            self.time_valid_label.setPalette(self.green_color)
+
+    def decode_attitude_valid(self, telemetry):
+        if telemetry['bct_time_valid'] == 0:
+            self.attitude_valid_label.setText("No")
+            self.attitude_valid_label.setPalette(self.red_color)
+        else:
+            self.attitude_valid_label.setText("Yes")
+            self.attitude_valid_label.setPalette(self.green_color)
+
 
     def stop_read(self):
         self.connected_port.close()

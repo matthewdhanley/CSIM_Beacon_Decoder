@@ -30,20 +30,20 @@ class CsimParser:
         # todo - update all of this
         # The telem points that are commented out still need unique functions. The rest of them use 
         #the new general decode function. It hasn't been tested so mileage may vary. 
-        telemetry['bct_adcs_mode'] = self.decode_spacecraft_mode(self.csim_packet[165])                    # [Unitless]
-        # telemetry['tai_label'] = self.stuff
-        # telemetry['time_valid_label'] = 
-        #todo telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[115:119], 4, 'sn', conversion=5e-10)
-        #todo telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[119:123], 4, 'sn', conversion=5e-10)
-        #todo telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[123:127], 4, 'sn', conversion=5e-10)
-        #todo telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[127:131], 4, 'sn', conversion=5e-10)
-        #todo telemetry['attitude_valid_label'] = stuff
+        telemetry['bct_adcs_mode'] = self.decode_general(self.csim_packet[165], 1, 'dn')                    # [Unitless]
+        telemetry['bct_tai_seconds'] = self.decode_general(self.csim_packet[55:63], 8, 'double')
+        telemetry['bct_time_valid'] = self.decode_general(self.csim_packet[63], 1, 'dn')
+        telemetry['bct_Q_BODY_WRT_ECI1'] = self.decode_general(self.csim_packet[127:131], 4, 'sn', conversion=5e-10)
+        telemetry['bct_Q_BODY_WRT_ECI2'] = self.decode_general(self.csim_packet[131:135], 4, 'sn', conversion=5e-10)
+        telemetry['bct_Q_BODY_WRT_ECI3'] = self.decode_general(self.csim_packet[135:139], 4, 'sn', conversion=5e-10)
+        telemetry['bct_Q_BODY_WRT_ECI4'] = self.decode_general(self.csim_packet[139:143], 4, 'sn', conversion=5e-10)
+        telemetry['attitude_valid_label'] = self.decode_general(self.csim_packet[167], 1, 'dn')
         telemetry['bct_filtered_speed_rpm1'] = self.decode_general(self.csim_packet[180:182], 2, 'sn', conversion=4e-1)
         telemetry['bct_filtered_speed_rpm2'] =self.decode_general(self.csim_packet[182:184], 2, 'sn', conversion=4e-1)
         telemetry['bct_filtered_speed_rpm3'] =self.decode_general(self.csim_packet[184:186], 2, 'sn', conversion=4e-1)
-        #todo telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[183:187], 4, 'sn', conversion=2e-9)
-        #todo telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[187:191], 4, 'sn', conversion=2e-9)
-        #todo telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[191:195], 4, 'sn', conversion=2e-9)
+        telemetry['bct_position_error1'] =self.decode_general(self.csim_packet[195:199], 4, 'sn', conversion=2e-9)
+        telemetry['bct_position_error2'] =self.decode_general(self.csim_packet[199:203], 4, 'sn', conversion=2e-9)
+        telemetry['bct_position_error3'] =self.decode_general(self.csim_packet[203:207], 4, 'sn', conversion=2e-9)
         telemetry['bct_box1_temp'] =self.decode_general(self.csim_packet[305:307], 2, 'sn', conversion=5e-3)
         telemetry['bct_bus_voltage'] =self.decode_general(self.csim_packet[315:317], 2,'sn', conversion=1e-3)
         telemetry['bct_voltage_12p0'] =self.decode_general(self.csim_packet[299], 1,'dn', conversion=1e-1)
@@ -74,8 +74,10 @@ class CsimParser:
         self.csim_packet = self.csim_packet[sync_offset:len(self.csim_packet)]
     
     def decode_general(self, bytearray_temp, nbytes, dtype, conversion=1.0, endian='big'):
+        
         if nbytes == 1:
             unpack_format = 'b'
+            bytearray_temp = bytes([bytearray_temp])  # need to convert to bytes
         elif nbytes == 2:
             unpack_format = 'h'
         elif nbytes == 4:
@@ -90,6 +92,8 @@ class CsimParser:
             unpack_format = unpack_format.upper()
         elif dtype == 'dn':
             unpack_format = unpack_format.lower()
+        elif dtype == 'double':
+            unpack_format = 'd'
         else:
             self.log.debug("Not an expected data format")
             return None
